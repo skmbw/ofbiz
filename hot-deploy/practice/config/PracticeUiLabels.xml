@@ -15,4 +15,14 @@
 	    <value xml:lang="en">OFBiz: Practice</value>
 	    <value xml:lang="zh">Leadon：立德昂</value>
 	</property>
+	
+	<property key="PracticePermissionMainActionAttributeMissing">
+	    <value xml:lang="en">auth attr miss</value>
+	    <value xml:lang="zh">授权属性丢失</value>
+	</property>
+	
+	<property key="PracticePermissionError">
+	    <value xml:lang="en">Practice auth error</value>
+	    <value xml:lang="zh">授权错误</value>
+	</property>
 </resource>

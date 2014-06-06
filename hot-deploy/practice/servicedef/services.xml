@@ -1,40 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/services.xsd">
-    <description>Example Services</description>
+    <description>Person Services</description>
     <vendor>OFBiz</vendor>
     <version>1.0</version>
 
-    <service name="createPracticePerson" default-entity-name="Person" engine="entity-auto"
-          location="component://practice/script/org/ofbiz/practice/PracticeServices.xml" invoke="create" auth="true">
-	     <description>Create a Person</description>
-	     <auto-attributes include="pk" mode="OUT" optional="false"/>
-	     <attribute name="salutation" mode="IN" type="String" optional="true"/>
-	     <attribute name="firstName" mode="IN" type="String" optional="false"/>
-	     <attribute name="middleName" mode="IN" type="String" optional="true"/>
-	     <attribute name="lastName" mode="IN" type="String" optional="false"/>
-	     <attribute name="suffix" mode="IN" type="String" optional="true"/>
-	</service>
-	
-	<service name="updatePracticePerson" default-entity-name="Person" engine="entity-auto"
-          location="component://practice/script/org/ofbiz/practice/PracticeServices.xml" invoke="update" auth="true">
-	     <description>Update a Person</description>
-	     <auto-attributes include="pk" mode="IN" optional="false"/>
-	     <attribute name="salutation" mode="IN" type="String" optional="true"/>
-	     <attribute name="firstName" mode="IN" type="String" optional="false"/>
-	     <attribute name="middleName" mode="IN" type="String" optional="true"/>
-	     <attribute name="lastName" mode="IN" type="String" optional="false"/>
-	     <attribute name="suffix" mode="IN" type="String" optional="true"/>
-	</service>
-	
-	<service name="deletePracticePerson" default-entity-name="Person" engine="entity-auto"
-          location="component://practice/script/org/ofbiz/practice/PracticeServices.xml" invoke="delete" auth="true">
-	     <description>Delete a Person</description>
-	     <auto-attributes include="pk" mode="IN" optional="false"/>
-	     <attribute name="salutation" mode="IN" type="String" optional="true"/>
-	     <attribute name="firstName" mode="IN" type="String" optional="false"/>
-	     <attribute name="middleName" mode="IN" type="String" optional="true"/>
-	     <attribute name="lastName" mode="IN" type="String" optional="false"/>
-	     <attribute name="suffix" mode="IN" type="String" optional="true"/>
-	</service>
+	<!-- Person Services -->
+    <service name="createPracticePerson" default-entity-name="Person" engine="entity-auto" invoke="create" auth="true">
+        <description>Create a Person</description>
+        <permission-service service-name="practiceGenericPermission" main-action="CREATE"/>
+        <auto-attributes include="pk" mode="OUT" optional="false"/>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <attribute name="salutation" mode="IN" type="String" optional="true"/>
+	    <attribute name="firstName" mode="IN" type="String" optional="false"/>
+	    <attribute name="middleName" mode="IN" type="String" optional="true"/>
+	    <attribute name="lastName" mode="IN" type="String" optional="false"/>
+	    <attribute name="suffix" mode="IN" type="String" optional="true"/>
+    </service>
+    <service name="updatePracticePerson" default-entity-name="Person" engine="entity-auto" invoke="update" auth="true">
+        <description>Update a Person</description>
+        <permission-service service-name="practiceGenericPermission" main-action="UPDATE"/>
+        <auto-attributes include="pk" mode="IN" optional="false"/>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <attribute name="id" type="String" mode="OUT" optional="false"/>
+    </service>
+    <service name="deletePracticePerson" default-entity-name="Person" engine="entity-auto" invoke="delete" auth="true">
+        <description>Delete a Person</description>
+        <permission-service service-name="practiceGenericPermission" main-action="DELETE"/>
+        <auto-attributes include="pk" mode="IN" optional="false"/>
+    </service>
+
+    <!-- Permission Services -->
+    <service name="practiceGenericPermission" engine="simple"
+             location="component://practice/script/org/ofbiz/PracticePermissionServices.xml" invoke="practiceGenericPermission">
+        <implements service="permissionInterface"/>
+    </service>
 </services>
