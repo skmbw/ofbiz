@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screens xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/widget-screen.xsd">
+    <screen name="main">
+        <section>
+            <widgets>
+                <label text="这是第一个例子UI。"/>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="person">
+	    <section>
+	        <actions>
+	            <script location="component://practice/webapp/practice/WEB-INF/actions/Person.groovy"/>
+	        </actions>
+	        <widgets>
+	            <decorator-screen name="CommonPracticeDecorator" location="${parameters.commonDecoratorLocation}">
+	                <decorator-section name="body">
+	                    <platform-specific>
+	                        <html>
+	                            <html-template location="component://practice/webapp/practice/Person.ftl"/>
+	                        </html>
+	                    </platform-specific>
+	                </decorator-section>
+	            </decorator-screen>       
+	        </widgets>
+	    </section>
+	</screen>
+	<screen name="personForm">
+        <section>
+            <actions>
+                <set field="headerItem" value="personForm"/>
+                <set field="titleProperty" value="PageTitlePracticePersonForm"/>
+                <entity-condition entity-name="Person" list="persons"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="main-decorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="body">
+                        <label text="Person List" style="h2"/>
+                        <include-form name="ListPersons" location="component://practice/widget/PracticeForms.xml"></include-form>
+                    </decorator-section>
+                </decorator-screen>    
+            </widgets>
+        </section>
+	</screen>
+	
+	<!-- 这个screen这里必须要有，否则登录会出错 -->
+	<screen name="main-decorator">
+        <section>
+            <actions>
+                <property-map resource="CommonUiLabels" map-name="uiLabelMap" global="true"/>
+                <property-map resource="PracticeUiLabels" map-name="uiLabelMap" global="true"/>
+                <set field="layoutSettings.companyName" from-field="uiLabelMap.PracticeCompanyName" global="true"/>
+                <set field="activeApp" value="practice" global="true"/>
+                <set field="applicationMenuName" value="PracticeAppBar" global="true"/>
+                <set field="applicationMenuLocation" value="component://practice/widget/PracticeMenus.xml" global="true"/>
+            </actions>
+            <widgets>
+                <include-screen name="GlobalDecorator" location="component://common/widget/CommonScreens.xml"/>
+            	<include-menu location="component://practice/widget/PracticeMenus.xml" name="PracticeAppBar"/>
+            	<decorator-section-include name="body"/>
+            </widgets>
+        </section>
+	</screen>
+</screens>

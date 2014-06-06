@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <property key="PracticeAjaxExamples">
+        <value xml:lang="en">Ajax Examples</value>
+        <value xml:lang="fr">Exemples Ajax</value>
+        <value xml:lang="it">Esempi Ajax</value>
+        <value xml:lang="zh">Ajax样例</value>
+    </property>
+    
+    <property key="PracticeApplication">
+	    <value xml:lang="en">This is first practice</value>
+	    <value xml:lang="zh">这是第一个练习</value>
+	</property>
+	<property key="PracticeCompanyName">
+	    <value xml:lang="en">OFBiz: Practice</value>
+	    <value xml:lang="zh">Leadon：立德昂</value>
+	</property>
+</resource>
