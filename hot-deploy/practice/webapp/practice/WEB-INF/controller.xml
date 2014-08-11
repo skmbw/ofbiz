@@ -66,5 +66,5 @@
        <!-- end of view mappings -->
        
        <!-- 错误页面 -->
-       <errorpage>/error/error.jsp</errorpage>
+<!--        <errorpage>error/error.jsp</errorpage> -->
 </site-conf>

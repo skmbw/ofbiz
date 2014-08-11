@@ -36,7 +36,7 @@
             <widgets>
                 <decorator-screen name="main-decorator" location="${parameters.mainDecoratorLocation}">
                     <decorator-section name="body">
-                        <label text="Person List" style="h2"/>
+                        <label text="人员列表" style="h2"/>
                         <include-form name="ListPersons" location="component://practice/widget/PracticeForms.xml"></include-form>
                     </decorator-section>
                 </decorator-screen>    
@@ -57,8 +57,9 @@
             </actions>
             <widgets>
                 <include-screen name="GlobalDecorator" location="component://common/widget/CommonScreens.xml"/>
-            	<include-menu location="component://practice/widget/PracticeMenus.xml" name="PracticeAppBar"/>
-            	<decorator-section-include name="body"/>
+                <!-- 下面这两个 如果不注释，菜单会重复。 -->
+<!--             	<include-menu location="component://practice/widget/PracticeMenus.xml" name="PracticeAppBar"/> -->
+<!--             	<decorator-section-include name="body"/> -->
             </widgets>
         </section>
 	</screen>
