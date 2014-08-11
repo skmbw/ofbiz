@@ -333,8 +333,8 @@ access. For a detailed description see the core/docs/entityconfig.html file.
             alias-view-columns="false"
             drop-fk-use-foreign-key-keyword="true"
             table-type="InnoDB"
-            character-set="latin1"
-            collate="latin1_general_cs">
+            character-set="utf8"
+            collate="utf8_general_ci">
         <read-data reader-name="tenant"/>
         <read-data reader-name="seed"/>
         <read-data reader-name="seed-initial"/>
@@ -364,8 +364,8 @@ access. For a detailed description see the core/docs/entityconfig.html file.
             alias-view-columns="false"
             drop-fk-use-foreign-key-keyword="true"
             table-type="InnoDB"
-            character-set="latin1"
-            collate="latin1_general_cs">
+            character-set="utf8"
+            collate="utf8_general_ci">
         <read-data reader-name="tenant"/>
         <read-data reader-name="seed"/>
         <read-data reader-name="seed-initial"/>
@@ -395,8 +395,8 @@ access. For a detailed description see the core/docs/entityconfig.html file.
             alias-view-columns="false"
             drop-fk-use-foreign-key-keyword="true"
             table-type="InnoDB"
-            character-set="latin1"
-            collate="latin1_general_cs">
+            character-set="utf8"
+            collate="utf8_general_ci">
         <read-data reader-name="tenant"/>
         <read-data reader-name="seed"/>
         <read-data reader-name="seed-initial"/>
@@ -426,8 +426,8 @@ access. For a detailed description see the core/docs/entityconfig.html file.
             alias-view-columns="false"
             drop-fk-use-foreign-key-keyword="true"
             table-type="InnoDB"
-            character-set="latin1"
-            collate="latin1_general_cs">
+            character-set="utf8"
+            collate="utf8_general_ci">
         <read-data reader-name="tenant"/>
         <read-data reader-name="seed"/>
         <inline-jdbc
