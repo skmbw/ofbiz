@@ -26,7 +26,7 @@ import org.ofbiz.entity.model.ModelEntity;
 
 /**
  * Generic Entity Primary Key Object
- *
+ * 泛型实体，主键对象。
  */
 @SuppressWarnings("serial")
 public class GenericPK extends GenericEntity {
