@@ -49,7 +49,7 @@
 <!--        <view-map name="login" type="screen" page="component://common/widget/CommonScreens.xml#login"/> -->
        
        <request-map uri="createPracticePerson">
-       		<security https="true" auth="true"/>
+<!--        		<security https="true" auth="true"/> -->
 		    <event type="service" invoke="createPracticePerson"/>
 		    <response name="success" type="view" value="personForm"/>
 	   </request-map>
@@ -63,6 +63,8 @@
  	   <view-map name="person" type="screen" page="component://practice/widget/PracticeScreens.xml#person"/>
  	   
  	   <view-map name="personForm" type="screen" page="component://practice/widget/PracticeScreens.xml#personForm"/>
+ 	   
+ 	   <view-map name="createPracticePerson" type="screen" page="component://practice/widget/PracticeScreens.xml#personForm"/>
        <!-- end of view mappings -->
        
        <!-- 错误页面 -->

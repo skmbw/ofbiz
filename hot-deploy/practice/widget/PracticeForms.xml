@@ -12,17 +12,17 @@
 	     <field name="lastName" ><display/> </field>
 	</form>
 	
-<!-- 	<form name="CreatePerson" type="single" target="createPracticePerson"> -->
-<!--       <auto-fields-service service-name="createPracticePerson"/> -->
-<!--       <field name="submitButton" title="Create" widget-style="smallSubmit"><submit button-type="button"/></field> -->
-<!-- 	</form> -->
+	<form name="CreatePerson" type="single" target="createPracticePerson">
+      <auto-fields-service service-name="createPracticePerson"/>
+      <field name="submitButton" title="Create" widget-style="smallSubmit"><submit button-type="button"/></field>
+	</form>
 	
-<!-- 	<form name="ListPersons" type="list" list-name="persons" list-entry-name="person" target="updatePracticePerson" paginate-target="personForm"> -->
-<!--         <auto-fields-service service-name="updatePracticePerson" default-field-type="edit" map-name="person"/> -->
-<!--         <field name="partyId"><hidden/></field> -->
-<!--         <field name="submitButton" title="Update" widget-style="smallSubmit"><submit button-type="button"/></field> -->
-<!--         <field name="deletePracticePerson" title="Delete Person" widget-style="buttontext"> -->
-<!--         <hyperlink target="deletePracticePerson?partyId=${person.partyId}" description="Delete"/> -->
-<!--       </field> -->
-<!-- 	</form> -->
+	<form name="ListPersons" type="list" list-name="persons" list-entry-name="person" target="updatePracticePerson" paginate-target="personForm">
+        <auto-fields-service service-name="updatePracticePerson" default-field-type="edit" map-name="person"/>
+        <field name="partyId"><hidden/></field>
+        <field name="submitButton" title="Update" widget-style="smallSubmit"><submit button-type="button"/></field>
+        <field name="deletePracticePerson" title="Delete Person" widget-style="buttontext">
+        <hyperlink target="deletePracticePerson?partyId=${person.partyId}" description="Delete"/>
+      </field>
+	</form>
 </forms>

@@ -7,6 +7,6 @@
 <title>Index</title>
 </head>
 <body>
-首页
+首页，这里仍然是开始的入口。每一个 应用都是以独立的app。
 </body>
 </html>

@@ -5,18 +5,29 @@
     <vendor>OFBiz</vendor>
     <version>1.0</version>
 
+	<service name="createPracticePerson" default-entity-name="Person" engine="simple"
+          location="component://practice/script/org/ofbiz/practice/PracticeServices.xml" invoke="createPracticePerson" auth="true">
+	     <description>Create a Person</description>
+	     <auto-attributes include="pk" mode="OUT" optional="false"/>
+	     <attribute name="salutation" mode="IN" type="String" optional="true"/>
+	     <attribute name="firstName" mode="IN" type="String" optional="false"/>
+	     <attribute name="middleName" mode="IN" type="String" optional="true"/>
+	     <attribute name="lastName" mode="IN" type="String" optional="false"/>
+	     <attribute name="suffix" mode="IN" type="String" optional="true"/>
+	</service>
+
 	<!-- Person Services -->
-    <service name="createPracticePerson" default-entity-name="Person" engine="entity-auto" invoke="create" auth="true">
-        <description>Create a Person</description>
-        <permission-service service-name="practiceGenericPermission" main-action="CREATE"/>
-        <auto-attributes include="pk" mode="OUT" optional="false"/>
-        <auto-attributes include="nonpk" mode="IN" optional="true"/>
-        <attribute name="salutation" mode="IN" type="String" optional="true"/>
-	    <attribute name="firstName" mode="IN" type="String" optional="false"/>
-	    <attribute name="middleName" mode="IN" type="String" optional="true"/>
-	    <attribute name="lastName" mode="IN" type="String" optional="false"/>
-	    <attribute name="suffix" mode="IN" type="String" optional="true"/>
-    </service>
+<!--     <service name="createPracticePerson" default-entity-name="Person" engine="entity-auto" invoke="create" auth="true"> -->
+<!--         <description>Create a Person</description> -->
+<!--         <permission-service service-name="practiceGenericPermission" main-action="CREATE"/> -->
+<!--         <auto-attributes include="pk" mode="OUT" optional="false"/> -->
+<!--         <auto-attributes include="nonpk" mode="IN" optional="true"/> -->
+<!--         <attribute name="salutation" mode="IN" type="String" optional="true"/> -->
+<!-- 	    <attribute name="firstName" mode="IN" type="String" optional="false"/> -->
+<!-- 	    <attribute name="middleName" mode="IN" type="String" optional="true"/> -->
+<!-- 	    <attribute name="lastName" mode="IN" type="String" optional="false"/> -->
+<!-- 	    <attribute name="suffix" mode="IN" type="String" optional="true"/> -->
+<!--     </service> -->
     <service name="updatePracticePerson" default-entity-name="Person" engine="entity-auto" invoke="update" auth="true">
         <description>Update a Person</description>
         <permission-service service-name="practiceGenericPermission" main-action="UPDATE"/>
