@@ -117,6 +117,12 @@ public abstract class GenericAsyncEngine extends AbstractEngine {
                 }
 
                 jobV = dispatcher.getDelegator().makeValue("JobSandbox", jFields);
+                // make sure we stored okay
+                if (jobV == null) {
+                    throw new GenericServiceException("Persisted job not created");
+                } else {
+                    Debug.logInfo("Persisted job queued : " + jobV.getString("jobName"), module);
+                }
                 jobV.create();
             } catch (GenericEntityException e) {
                 throw new GenericServiceException("Unable to create persisted job", e);
@@ -128,12 +134,6 @@ public abstract class GenericAsyncEngine extends AbstractEngine {
                 throw new GenericServiceException("Problem serializing service attributes", e);
             }
 
-            // make sure we stored okay
-            if (jobV == null) {
-                throw new GenericServiceException("Persisted job not created");
-            } else {
-                Debug.logInfo("Persisted job queued : " + jobV.getString("jobName"), module);
-            }
         } else {
             JobManager jMgr = dispatcher.getJobManager();
             if (jMgr != null) {

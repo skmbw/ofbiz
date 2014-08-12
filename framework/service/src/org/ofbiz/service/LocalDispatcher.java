@@ -28,6 +28,7 @@ import org.ofbiz.service.job.JobManager;
 
 /**
  * Generic Services Local Dispatcher
+ * <p>通用服务，本地分发器。
  */
 public interface LocalDispatcher {
 

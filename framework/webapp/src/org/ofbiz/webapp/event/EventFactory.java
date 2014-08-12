@@ -44,6 +44,10 @@ public class EventFactory {
     protected ServletContext context = null;
     protected Map<String, EventHandler> handlers = null;
 
+    /**
+     * 构建事件工厂，预加载所有的事件处理器。
+     * @param requestHandler
+     */
     public EventFactory(RequestHandler requestHandler) {
         handlers = FastMap.newInstance();
         this.requestHandler = requestHandler;

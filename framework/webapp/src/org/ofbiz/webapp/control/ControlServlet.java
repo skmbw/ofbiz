@@ -55,10 +55,10 @@ import freemarker.ext.servlet.ServletContextHashModel;
 
 /**
  * ControlServlet.java - Master servlet for the web application.
+ * <p>web应用的主servlet，主控制器。
  */
-@SuppressWarnings("serial")
 public class ControlServlet extends HttpServlet {
-
+    private static final long serialVersionUID = 1L;
     public static final String module = ControlServlet.class.getName();
 
     public ControlServlet() {
@@ -107,6 +107,7 @@ public class ControlServlet extends HttpServlet {
         }
 
         // setup content type
+        // 设置内容类型，响应的相关头信息
         String contentType = "text/html";
         if (charset.length() > 0 && !"none".equals(charset)) {
             response.setContentType(contentType + "; charset=" + charset);
@@ -115,6 +116,7 @@ public class ControlServlet extends HttpServlet {
             response.setContentType(contentType);
         }
 
+        // 当前登录的用户信息
         GenericValue userLogin = (GenericValue) session.getAttribute("userLogin");
         //Debug.logInfo("Cert Chain: " + request.getAttribute("javax.servlet.request.X509Certificate"), module);
 
@@ -152,6 +154,8 @@ public class ControlServlet extends HttpServlet {
 
         // for convenience, and necessity with event handlers, make security and delegator available in the request:
         // try to get it from the session first so that we can have a delegator/dispatcher/security for a certain user if desired
+        // 方便方法，让security 和 delegator在当前request中可用。某些用户如果需要的情况下可以使用。
+        // 尝试从session中获取Entity Delegator，没有再从工厂中获取，在次从servletcontext中获取。
         Delegator delegator = null;
         String delegatorName = (String) session.getAttribute("delegatorName");
         if (UtilValidate.isNotEmpty(delegatorName)) {
@@ -168,6 +172,7 @@ public class ControlServlet extends HttpServlet {
             session.setAttribute("delegatorName", delegator.getDelegatorName());
         }
 
+        // 获取本地请求分发器
         LocalDispatcher dispatcher = (LocalDispatcher) session.getAttribute("dispatcher");
         if (dispatcher == null) {
             dispatcher = (LocalDispatcher) getServletContext().getAttribute("dispatcher");
@@ -177,6 +182,7 @@ public class ControlServlet extends HttpServlet {
         }
         request.setAttribute("dispatcher", dispatcher);
 
+        // 获取授权管理器
         Authorization authz = (Authorization) session.getAttribute("authz");
         if (authz == null) {
             authz = (Authorization) getServletContext().getAttribute("authz");
@@ -186,6 +192,7 @@ public class ControlServlet extends HttpServlet {
         }
         request.setAttribute("authz", authz); // maybe we should also add the value to 'security'
 
+        // 获取安全管理器
         Security security = (Security) session.getAttribute("security");
         if (security == null) {
             security = (Security) getServletContext().getAttribute("security");
@@ -205,6 +212,7 @@ public class ControlServlet extends HttpServlet {
         VisitHandler.getVisitor(request, response);
 
         // set the Entity Engine user info if we have a userLogin
+        // 从登录用户中获取visitId，设置Entity Engine用户信息
         String visitId = VisitHandler.getVisitId(session);
         if (UtilValidate.isNotEmpty(visitId)) {
             GenericDelegator.pushSessionIdentifier(visitId);
@@ -221,6 +229,7 @@ public class ControlServlet extends HttpServlet {
         String errorPage = null;
         try {
             // the ServerHitBin call for the event is done inside the doRequest method
+            // 真正的处理请求
             requestHandler.doRequest(request, response, null, userLogin, delegator);
         } catch (RequestHandlerException e) {
             Throwable throwable = e.getNested() != null ? e.getNested() : e;
@@ -246,6 +255,7 @@ public class ControlServlet extends HttpServlet {
         // if (Debug.infoOn()) Debug.logInfo("[" + rname + "] Event done, rendering page: " + nextPage, module);
         // if (Debug.timingOn()) timer.timerString("[" + rname + "] Event done, rendering page: " + nextPage, module);
 
+        // 出现错误，处理错误信息
         if (errorPage != null) {
             Debug.logError("An error occurred, going to the errorPage: " + errorPage, module);
 
@@ -296,15 +306,16 @@ public class ControlServlet extends HttpServlet {
         }
 
         // sanity check: make sure we don't have any transactions in place
+        // 清醒检查，确保我们不处在任何事务中
         try {
             // roll back current TX first
-            if (TransactionUtil.isTransactionInPlace()) {
+            if (TransactionUtil.isTransactionInPlace()) {// 如果处在事务中，回滚
                 Debug.logWarning("*** NOTICE: ControlServlet finished w/ a transaction in place! Rolling back.", module);
                 TransactionUtil.rollback();
             }
 
             // now resume/rollback any suspended txs
-            if (TransactionUtil.suspendedTransactionsHeld()) {
+            if (TransactionUtil.suspendedTransactionsHeld()) {// 如果处在挂起的事务中，清理挂起的事务
                 int suspended = TransactionUtil.cleanSuspendedTransactions();
                 Debug.logWarning("Resumed/Rolled Back [" + suspended + "] transactions.", module);
             }
@@ -331,6 +342,7 @@ public class ControlServlet extends HttpServlet {
         if (Debug.timingOn()) timer.timerString("[" + rname + "(Domain:" + request.getScheme() + "://" + request.getServerName() + ")] Request Done", module);
 
         // sanity check 2: make sure there are no user or session infos in the delegator, ie clear the thread
+        // 神智清醒检查，确保没有用户或者session信息在delegator中
         GenericDelegator.clearUserIdentifierStack();
         GenericDelegator.clearSessionIdentifierStack();
     }
@@ -343,10 +355,17 @@ public class ControlServlet extends HttpServlet {
         super.destroy();
     }
 
+    /**
+     * 获得请求处理器
+     * @return RequestHandler
+     */
     protected RequestHandler getRequestHandler() {
         return RequestHandler.getRequestHandler(getServletContext());
     }
 
+    /**
+     * 配置beanshell
+     */
     protected void configureBsf() {
         String[] bshExtensions = {"bsh"};
         BSFManager.registerScriptingEngine("beanshell", "org.ofbiz.base.util.OfbizBshBsfEngine", bshExtensions);
@@ -358,6 +377,10 @@ public class ControlServlet extends HttpServlet {
         BSFManager.registerScriptingEngine("simplemethod", "org.ofbiz.minilang.SimpleMethodBsfEngine", smExtensions);
     }
 
+    /**
+     * 记录请求信息日志。
+     * @param request
+     */
     protected void logRequestInfo(HttpServletRequest request) {
         ServletContext servletContext = this.getServletContext();
         HttpSession session = request.getSession();

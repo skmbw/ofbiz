@@ -50,7 +50,6 @@ import org.ofbiz.base.util.UtilValidate;
 import org.ofbiz.entity.Delegator;
 import org.ofbiz.entity.GenericEntityException;
 import org.ofbiz.entity.GenericValue;
-import org.ofbiz.entity.transaction.TransactionUtil;
 import org.ofbiz.webapp.event.EventFactory;
 import org.ofbiz.webapp.event.EventHandler;
 import org.ofbiz.webapp.event.EventHandlerException;
@@ -63,12 +62,14 @@ import org.owasp.esapi.errors.EncodingException;
 
 /**
  * RequestHandler - Request Processor Object
+ * <p>请求处理器。
  */
 public class RequestHandler {
 
     public static final String module = RequestHandler.class.getName();
 
     public static RequestHandler getRequestHandler(ServletContext servletContext) {
+        // 从servlet上下文中获取请求处理器，没有获取到，new一个。
         RequestHandler rh = (RequestHandler) servletContext.getAttribute("_REQUEST_HANDLER_");
         if (rh == null) {
             rh = new RequestHandler();
@@ -83,66 +84,100 @@ public class RequestHandler {
     protected EventFactory eventFactory = null;
     protected URL controllerConfigURL = null;
 
+    /**
+     * 初始化请求处理器，读取controller.xml的配置文件
+     * @param context servlet上下文
+     */
     public void init(ServletContext context) {
         if (Debug.verboseOn()) Debug.logVerbose("[RequestHandler Loading...]", module);
         this.context = context;
 
         // init the ControllerConfig, but don't save it anywhere
+        // 初始化控制器配置，此处没有保存，但是配置文件已经被加载，那么下次加载就直接从缓存中获取了。
         this.controllerConfigURL = ConfigXMLReader.getControllerConfigURL(context);
         ConfigXMLReader.getControllerConfig(this.controllerConfigURL);
-        this.viewFactory = new ViewFactory(this);
-        this.eventFactory = new EventFactory(this);
+        this.viewFactory = new ViewFactory(this);// 构建视图工厂
+        this.eventFactory = new EventFactory(this);// 构建事件工厂
     }
 
+    /**
+     * 获得控制器配置。优先从缓存中加载
+     * @return 控制器配置。
+     */
     public ConfigXMLReader.ControllerConfig getControllerConfig() {
         return ConfigXMLReader.getControllerConfig(this.controllerConfigURL);
     }
 
+    /**
+     * 请求处理。
+     * @param request HttpServletRequest
+     * @param response HttpServletResponse
+     * @param requestUri 请求的URI
+     * @throws RequestHandlerException
+     */
     public void doRequest(HttpServletRequest request, HttpServletResponse response, String requestUri) throws RequestHandlerException {
         HttpSession session = request.getSession();
+        // 从请求中获取Entity Delegator，实体委托类。
         Delegator delegator = (Delegator) request.getAttribute("delegator");
+        // 从session中获取当前的登录用户信息
         GenericValue userLogin = (GenericValue) session.getAttribute("userLogin");
         doRequest(request, response, requestUri, userLogin, delegator);
     }
 
+    /**
+     * 请求处理，开始业务处理。
+     * @param request HttpServletRequest
+     * @param response HttpServletResponse
+     * @param chain 请求的uri
+     * @param userLogin 当前登录的用户
+     * @param delegator Entity委托
+     * @throws RequestHandlerException
+     */
     public void doRequest(HttpServletRequest request, HttpServletResponse response, String chain,
             GenericValue userLogin, Delegator delegator) throws RequestHandlerException {
 
         HttpSession session = request.getSession();
 
         // get the controllerConfig once for this method so we don't have to get it over and over inside the method
+        // 获取一次控制器配置，避免以后多次获取
         ConfigXMLReader.ControllerConfig controllerConfig = this.getControllerConfig();
+        // url映射Map
         Map<String, ConfigXMLReader.RequestMap> requestMapMap = controllerConfig.getRequestMapMap();
         
         // workaround if we are in the root webapp
+        // 获得当前应用的名字
         String cname = UtilHttp.getApplicationName(request);
 
         // Grab data from request object to process
+        // 请求路径的处理，检查是否有默认的请求url
         String defaultRequestUri = RequestHandler.getRequestUri(request.getPathInfo());
-        if (request.getAttribute("targetRequestUri") == null) {
-            if (request.getSession().getAttribute("_PREVIOUS_REQUEST_") != null) {
+        if (request.getAttribute("targetRequestUri") == null) {// 没有默认的请求url
+            if (request.getSession().getAttribute("_PREVIOUS_REQUEST_") != null) {// 有以前的请求，将目标对象url设为以前url
                 request.setAttribute("targetRequestUri", request.getSession().getAttribute("_PREVIOUS_REQUEST_"));
             } else {
                 request.setAttribute("targetRequestUri", "/" + defaultRequestUri);
             }
         }
 
+        // 重写的视图url
         String overrideViewUri = RequestHandler.getOverrideViewUri(request.getPathInfo());
 
+        // 没有请求url的异常错误信息
         String requestMissingErrorMessage = "Unknown request [" + defaultRequestUri + "]; this request does not exist or cannot be called directly.";
         ConfigXMLReader.RequestMap requestMap = null;
         if (defaultRequestUri != null) {
-            requestMap = requestMapMap.get(defaultRequestUri);
+            requestMap = requestMapMap.get(defaultRequestUri);// 获取url对应的action（控制器）
         }
         // check for default request
         if (requestMap == null) {
-            String defaultRequest = controllerConfig.getDefaultRequest();
+            String defaultRequest = controllerConfig.getDefaultRequest();// 获取默认的请求处理器
             if (defaultRequest != null) { // required! to avoid a null pointer exception and generate a requesthandler exception if default request not found.
                 requestMap = requestMapMap.get(defaultRequest);
             }
         }
 
         // check for override view
+        // 检查重写的视图url
         if (overrideViewUri != null) {
             ConfigXMLReader.ViewMap viewMap = getControllerConfig().getViewMapMap().get(overrideViewUri);
             if (viewMap == null) {
@@ -154,6 +189,7 @@ public class RequestHandler {
         }
 
         // still not found so stop
+        // 始终没有找到，请求处理器，抛异常
         if (requestMap == null) {
             throw new RequestHandlerException(requestMissingErrorMessage);
         }
@@ -162,12 +198,14 @@ public class RequestHandler {
         boolean interruptRequest = false;
 
         // Check for chained request.
+        // 检查过滤器链式请求
         if (chain != null) {
             String chainRequestUri = RequestHandler.getRequestUri(chain);
             requestMap = requestMapMap.get(chainRequestUri);
             if (requestMap == null) {
                 throw new RequestHandlerException("Unknown chained request [" + chainRequestUri + "]; this request does not exist");
             }
+            // post 链式 视图
             if (request.getAttribute("_POST_CHAIN_VIEW_") != null) {
                 overrideViewUri = (String) request.getAttribute("_POST_CHAIN_VIEW_");
             } else {
@@ -198,6 +236,7 @@ public class RequestHandler {
             }
             boolean forceHttpSession = "true".equals(context.getInitParameter("forceHttpSession"));
             // Check if we SHOULD be secure and are not.
+            // 检查是否应该使用http安全协议
             String forwardedProto = request.getHeader("X-Forwarded-Proto");
             boolean isForwardedSecure = UtilValidate.isNotEmpty(forwardedProto) && "HTTPS".equals(forwardedProto.toUpperCase());
             if ((!request.isSecure() && !isForwardedSecure) && requestMap.securityHttps) {
@@ -210,15 +249,18 @@ public class RequestHandler {
 
                     // see if HTTPS is enabled, if not then log a warning instead of throwing an exception
                     Boolean enableHttps = null;
+                    // 检查https是否被激活，如果没有警告。1、先查数据库
                     String webSiteId = WebSiteWorker.getWebSiteId(request);
                     if (webSiteId != null) {
                         try {
+                            // 根据webSiteId查询实体WebSite
                             GenericValue webSite = delegator.findByPrimaryKeyCache("WebSite", UtilMisc.toMap("webSiteId", webSiteId));
-                            if (webSite != null) enableHttps = webSite.getBoolean("enableHttps");
+                            if (webSite != null) enableHttps = webSite.getBoolean("enableHttps");// 取enableHttps得boolean值，是否激活
                         } catch (GenericEntityException e) {
                             Debug.logWarning(e, "Problems with WebSite entity; using global defaults", module);
                         }
                     }
+                    // 2、如果没有激活，查看配置项，是否激活
                     if (enableHttps == null) {
                         enableHttps = UtilProperties.propertyValueEqualsIgnoreCase("url.properties", "port.https.enabled", "Y");
                     }
@@ -231,13 +273,14 @@ public class RequestHandler {
                 } else {
                     StringBuilder urlBuf = new StringBuilder();
                     urlBuf.append(request.getPathInfo());
-                    if (request.getQueryString() != null) {
+                    if (request.getQueryString() != null) {// 组装查询字符串
                         urlBuf.append("?").append(request.getQueryString());
                     }
+                    // 最终的请求url
                     String newUrl = RequestHandler.makeUrl(request, response, urlBuf.toString());
                     if (newUrl.toUpperCase().startsWith("HTTPS")) {
                         // if we are supposed to be secure, redirect secure.
-                        callRedirect(newUrl, response, request);
+                        callRedirect(newUrl, response, request);// 如果是安全协议，重定向
                         return;
                     }
                 }
@@ -292,6 +335,7 @@ public class RequestHandler {
             }
 
             // If its the first visit run the first visit events.
+            // 如果是第一次访问，运行第一次访问事件
             if (this.trackVisit(request) && session.getAttribute("_FIRST_VISIT_EVENTS_") == null) {
                 if (Debug.infoOn())
                     Debug.logInfo("This is the first request in this visit." + " sessionId=" + UtilHttp.getSessionId(request), module);
@@ -311,9 +355,11 @@ public class RequestHandler {
             }
 
             // Invoke the pre-processor (but NOT in a chain)
+            // 调用预处理器事件
             for (ConfigXMLReader.Event event: controllerConfig.getPreprocessorEventList().values()) {
                 try {
                     String returnString = this.runEvent(request, response, event, null, "preprocessor");
+                    // 检查调用预处理器事件是否成功
                     if (returnString != null && !returnString.equalsIgnoreCase("success")) {
                         if (!returnString.contains(":_protect_:")) {
                             throw new EventHandlerException("Pre-Processor event [" + event.invoke + "] did not return 'success'.");
@@ -348,16 +394,19 @@ public class RequestHandler {
 
         // Pre-Processor/First-Visit event(s) can interrupt the flow by returning null.
         // Warning: this could cause problems if more then one event attempts to return a response.
+        // 预处理器或者第一次访问事件，可以中断流程，返回null。这个可能导致问题（如果多个response要直接返回）
         if (interruptRequest) {
             if (Debug.infoOn()) Debug.logInfo("[Pre-Processor Interrupted Request, not running: [" + requestMap.uri + "], sessionId=" + UtilHttp.getSessionId(request), module);
             return;
         }
 
         if (Debug.verboseOn()) Debug.logVerbose("[Processing Request]: " + requestMap.uri + " sessionId=" + UtilHttp.getSessionId(request), module);
+        // 存储真正的请求url
         request.setAttribute("thisRequestUri", requestMap.uri); // store the actual request URI
 
 
         // Perform security check.
+        // 执行安全验证
         if (requestMap.securityAuth) {
             // Invoke the security handler
             // catch exceptions and throw RequestHandlerException if failed.
@@ -370,10 +419,12 @@ public class RequestHandler {
             } catch (EventHandlerException e) {
                 throw new RequestHandlerException(e.getMessage(), e);
             }
+            // 安全验证失败
             if (!"success".equalsIgnoreCase(checkLoginReturnString)) {
                 // previous URL already saved by event, so just do as the return says...
                 eventReturn = checkLoginReturnString;
                 // if the request is an ajax request we don't want to return the default login check
+                // ajax不能直接返回默认的登录验证，返回ajax的
                 if (!"XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
                     requestMap = requestMapMap.get("checkLogin");
                 } else {
@@ -391,6 +442,7 @@ public class RequestHandler {
             }
 
             // to avoid this data being included again, now remove the _PREVIOUS_PARAM_MAP_ attribute
+            // 为了避免数据再次被放入session中，移除他
             request.getSession().removeAttribute("_PREVIOUS_PARAM_MAP_FORM_");
         }
 
@@ -398,6 +450,7 @@ public class RequestHandler {
         ConfigXMLReader.RequestResponse nextRequestResponse = null;
 
         // Invoke the defined event (unless login failed)
+        // 调用定义的事件
         if (eventReturn == null && requestMap.event != null) {
             if (requestMap.event.type != null && requestMap.event.path != null && requestMap.event.invoke != null) {
                 try {
@@ -432,6 +485,7 @@ public class RequestHandler {
 
         // Process the eventReturn
         // at this point eventReturnString is finalized, so get the RequestResponse
+        // 处理事件返回结果
         ConfigXMLReader.RequestResponse eventReturnBasedRequestResponse = eventReturn == null ? null : requestMap.requestResponseMap.get(eventReturn);
         if (eventReturnBasedRequestResponse != null) {
             //String eventReturnBasedResponse = requestResponse.value;
@@ -541,14 +595,14 @@ public class RequestHandler {
         String saveName = null;
         if (nextRequestResponse.saveCurrentView) { saveName = "SAVED"; }
         if (nextRequestResponse.saveHomeView) { saveName = "HOME"; }
-
+        // 链式请求，处理下一个请求
         if ("request".equals(nextRequestResponse.type)) {
             // chained request
             Debug.logInfo("[RequestHandler.doRequest]: Response is a chained request." + " sessionId=" + UtilHttp.getSessionId(request), module);
             doRequest(request, response, nextRequestResponse.value, userLogin, delegator);
         } else {
             // ======== handle views ========
-
+            // 视图处理
             // first invoke the post-processor events.
             for (ConfigXMLReader.Event event: controllerConfig.getPostprocessorEventList().values()) {
                 try {
@@ -654,10 +708,15 @@ public class RequestHandler {
         }
     }
 
-    /** Find the event handler and invoke an event. */
+    /** 
+     * Find the event handler and invoke an event. 
+     * <p>查找事件处理器，调用事件。这里就调用到service层了。
+     */
     public String runEvent(HttpServletRequest request, HttpServletResponse response,
             ConfigXMLReader.Event event, ConfigXMLReader.RequestMap requestMap, String trigger) throws EventHandlerException {
+        // 查找事件处理器
         EventHandler eventHandler = eventFactory.getEventHandler(event.type);
+        // 调用事件
         String eventReturn = eventHandler.invoke(event, requestMap, request, response);
         if (Debug.verboseOn() || (Debug.infoOn() && "request".equals(trigger))) Debug.logInfo("Ran Event [" + event.type + ":" + event.path + "#" + event.invoke + "] from [" + trigger + "], result is [" + eventReturn + "]", module);
         return eventReturn;
@@ -717,9 +776,17 @@ public class RequestHandler {
         return nextPage;
     }
 
+    /**
+     * 重定向
+     * @param url 重定向的url
+     * @param resp HttpServletResponse
+     * @param req HttpServletRequest
+     * @throws RequestHandlerException
+     */
     private void callRedirect(String url, HttpServletResponse resp, HttpServletRequest req) throws RequestHandlerException {
         if (Debug.infoOn()) Debug.logInfo("Sending redirect to: [" + url + "], sessionId=" + UtilHttp.getSessionId(req), module);
         // set the attributes in the session so we can access it.
+        // 重新设置session中属性，以便后面能方位到，因为重定向会丢失
         Enumeration<String> attributeNameEnum = UtilGenerics.cast(req.getAttributeNames());
         Map<String, Object> reqAttrMap = FastMap.newInstance();
         while (attributeNameEnum.hasMoreElements()) {
@@ -730,6 +797,7 @@ public class RequestHandler {
             }
         }
         if (reqAttrMap.size() > 0) {
+            //RequestHandler不能序列化，必须删除掉
             reqAttrMap.remove("_REQUEST_HANDLER_");  // RequestHandler is not serializable and must be removed first.  See http://issues.apache.org/jira/browse/OFBIZ-750
             byte[] reqAttrMapBytes = UtilObject.getBytes(reqAttrMap);
             if (reqAttrMapBytes != null) {
@@ -739,14 +807,25 @@ public class RequestHandler {
 
         // send the redirect
         try {
-            resp.sendRedirect(url);
+            resp.sendRedirect(url);// 重定向
         } catch (IOException ioe) {
             throw new RequestHandlerException(ioe.getMessage(), ioe);
         } catch (IllegalStateException ise) {
             throw new RequestHandlerException(ise.getMessage(), ise);
         }
     }
+    
+    /**
+     * 装饰视图页面。
+     * @param view
+     * @param allowExtView
+     * @param req
+     * @param resp
+     * @param saveName
+     * @throws RequestHandlerException
+     */
     private void renderView(String view, boolean allowExtView, HttpServletRequest req, HttpServletResponse resp, String saveName) throws RequestHandlerException {
+        // 获取登录用户
         GenericValue userLogin = (GenericValue) req.getSession().getAttribute("userLogin");
         // workaraound if we are in the root webapp
         String cname = UtilHttp.getApplicationName(req);
@@ -773,10 +852,13 @@ public class RequestHandler {
         req.setAttribute("_CURRENT_VIEW_", view);
 
         // save the view in the session for the last view, plus the parameters Map (can use all parameters as they will never go into a URL, will only stay in the session and extra data will be ignored as we won't go to the original request just the view); note that this is saved after the request/view processing has finished so when those run they will get the value from the previous request
+        // 获取请求参数
         Map<String, Object> paramMap = UtilHttp.getParameterMap(req);
         // add in the attributes as well so everything needed for the rendering context will be in place if/when we get back to this view
+        // 添加http属性到map中，装饰视图会使用到
         paramMap.putAll(UtilHttp.getAttributeMap(req));
         UtilMisc.makeMapSerializable(paramMap);
+        // 将属性放入session中
         if (paramMap.containsKey("_LAST_VIEW_NAME_")) { // Used by lookups to keep the real view (request)
             req.getSession().setAttribute("_LAST_VIEW_NAME_", paramMap.get("_LAST_VIEW_NAME_"));
         } else {
@@ -799,6 +881,7 @@ public class RequestHandler {
             req.getSession().removeAttribute("_SAVED_VIEW_PARAMS_");
         }
 
+        // 查找视图映射
         ConfigXMLReader.ViewMap viewMap = (view == null ? null : getControllerConfig().getViewMapMap().get(view));
         if (viewMap == null) {
             throw new RequestHandlerException("No definition found for view with name [" + view + "]");
@@ -806,6 +889,7 @@ public class RequestHandler {
 
         String nextPage;
 
+        // 检查视图页面
         if (viewMap.page == null) {
             if (!allowExtView) {
                 throw new RequestHandlerException("No view to render.");
@@ -860,9 +944,11 @@ public class RequestHandler {
            if (Debug.verboseOn()) Debug.logVerbose("Sending no-cache headers for view [" + nextPage + "]", module);
         }
 
+        // 开始装饰视图
         try {
             if (Debug.verboseOn()) Debug.logVerbose("Rendering view [" + nextPage + "] of type [" + viewMap.type + "]", module);
             ViewHandler vh = viewFactory.getViewHandler(viewMap.type);
+            // 装饰视图
             vh.render(view, nextPage, viewMap.info, contentType, charset, req, resp);
         } catch (ViewHandlerException e) {
             Throwable throwable = e.getNested() != null ? e.getNested() : e;
@@ -872,6 +958,7 @@ public class RequestHandler {
 
         // before getting the view generation time flush the response output to get more consistent results
         try {
+            // 清理缓冲区
             resp.flushBuffer();
         } catch (java.io.IOException e) {
             /*If request is an ajax request and user calls abort() method for on ajax request then skip throwing of RequestHandlerException .
@@ -892,6 +979,12 @@ public class RequestHandler {
         }
     }
 
+    /**
+     * 获取默认配置的url信息
+     * @param request
+     * @param secure
+     * @return
+     */
     public static String getDefaultServerRootUrl(HttpServletRequest request, boolean secure) {
         String httpsPort = UtilProperties.getPropertyValue("url.properties", "port.https", "443");
         String httpsServer = UtilProperties.getPropertyValue("url.properties", "force.https.host");
@@ -931,7 +1024,7 @@ public class RequestHandler {
 
     /**
      * Creates a query string based on the redirect parameters for a request response, if specified, or for all request parameters if no redirect parameters are specified.
-     *
+     * <p>基于重定向的参数，创建一个查询字符串
      * @param request the Http request
      * @param requestResponse the RequestResponse Object
      * @return return the query string
@@ -995,6 +1088,16 @@ public class RequestHandler {
         return makeLink(request, response, url, false, false, true);
     }
 
+    /**
+     * 构建一个url连接
+     * @param request
+     * @param response
+     * @param url
+     * @param fullPath
+     * @param secure
+     * @param encode
+     * @return
+     */
     public String makeLink(HttpServletRequest request, HttpServletResponse response, String url, boolean fullPath, boolean secure, boolean encode) {
         Delegator delegator = (Delegator) request.getAttribute("delegator");
         String webSiteId = WebSiteWorker.getWebSiteId(request);
@@ -1153,6 +1256,11 @@ public class RequestHandler {
         return rh.makeLink(request, response, url, fullPath, secure, encode);
     }
 
+    /**
+     * 运行登录后事件
+     * @param request
+     * @param response
+     */
     public void runAfterLoginEvents(HttpServletRequest request, HttpServletResponse response) {
         for (ConfigXMLReader.Event event: getControllerConfig().getAfterLoginEventList().values()) {
             try {
@@ -1166,6 +1274,11 @@ public class RequestHandler {
         }
     }
 
+    /**
+     * 运行登出前事件
+     * @param request
+     * @param response
+     */
     public void runBeforeLogoutEvents(HttpServletRequest request, HttpServletResponse response) {
         for (ConfigXMLReader.Event event: getControllerConfig().getBeforeLogoutEventList().values()) {
             try {
@@ -1179,6 +1292,11 @@ public class RequestHandler {
         }
     }
 
+    /**
+     * 跟踪统计
+     * @param request
+     * @return
+     */
     public boolean trackStats(HttpServletRequest request) {
         if (!"false".equalsIgnoreCase(context.getInitParameter("track-serverhit"))) {
             String uriString = RequestHandler.getRequestUri(request.getPathInfo());
@@ -1193,6 +1311,11 @@ public class RequestHandler {
         }
     }
 
+    /**
+     * 跟踪访问
+     * @param request
+     * @return
+     */
     public boolean trackVisit(HttpServletRequest request) {
         if (!"false".equalsIgnoreCase(context.getInitParameter("track-visit"))) {
             String uriString = RequestHandler.getRequestUri(request.getPathInfo());

@@ -60,7 +60,7 @@ public class MapContext<K, V> implements Map<K, V>, Reusable, LocalizedMap<V> {
         return newValue;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public static <K, V> MapContext<K, V> createMapContext(Map<K, V> baseMap) {
         MapContext<K, V> newValue = MapContext.getMapContext();
         if (baseMap instanceof MapContext) {

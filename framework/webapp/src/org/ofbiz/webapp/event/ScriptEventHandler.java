@@ -109,7 +109,8 @@ public final class ScriptEventHandler implements EventHandler {
                 return "error";
             }
             if (result instanceof Map) {
-                Map resultMap = (Map)result;
+                @SuppressWarnings("unchecked")
+                Map<String, String> resultMap = (Map<String, String>)result;
                 String successMessage = (String)resultMap.get("_event_message_");
                 if (successMessage != null) {
                     request.setAttribute("_EVENT_MESSAGE_", successMessage);

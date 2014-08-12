@@ -42,6 +42,10 @@ public class ViewFactory {
     protected ServletContext context = null;
     protected Map<String, ViewHandler> handlers = null;
 
+    /**
+     * 构建视图工厂，预加载所有的视图处理器
+     * @param requestHandler
+     */
     public ViewFactory(RequestHandler requestHandler) {
         this.handlers = FastMap.newInstance();
         this.requestHandler = requestHandler;
@@ -49,13 +53,17 @@ public class ViewFactory {
 
         // pre-load all the view handlers
         try {
-            this.preLoadAll();
+            this.preLoadAll();// 预加载所有的视图处理器
         } catch (ViewHandlerException e) {
             Debug.logError(e, module);
             throw new GeneralRuntimeException(e);
         }
     }
 
+    /**
+     * 预加载所有的视图处理器
+     * @throws ViewHandlerException
+     */
     private void preLoadAll() throws ViewHandlerException {
         Set<String> handlers = this.requestHandler.getControllerConfig().getViewHandlerMap().keySet();
         if (handlers != null) {
@@ -109,6 +117,12 @@ public class ViewFactory {
         handlers.clear();
     }
 
+    /**
+     * 加载指定的视图处理器
+     * @param type 视图处理器类型
+     * @return
+     * @throws ViewHandlerException
+     */
     private ViewHandler loadViewHandler(String type) throws ViewHandlerException {
         ViewHandler handler = null;
         String handlerClass = this.requestHandler.getControllerConfig().getViewHandlerMap().get(type);

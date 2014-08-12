@@ -40,9 +40,9 @@ import java.util.concurrent.FutureTask;
 
 import javolution.util.FastList;
 import javolution.util.FastMap;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.ofbiz.base.concurrent.ExecutionPool;
 import org.ofbiz.base.util.Debug;
 import org.ofbiz.base.util.UtilTimer;
@@ -860,6 +860,7 @@ public class DatabaseUtil {
         protected Detection(String name, boolean required, String methodName, Object... params) throws NoSuchMethodException {
             this.name = name;
             this.required = required;
+            @SuppressWarnings("rawtypes")
             Class[] paramTypes = new Class[params.length];
             for (int i = 0; i < params.length; i++) {
                 Class<?> paramType = params[i].getClass();

@@ -22,8 +22,8 @@ under the License.
 <div id="footer">
   <ul>
     <li>
-      ${uiLabelMap.CommonCopyright} (c) 2001-${nowTimestamp?string("yyyy")} The Apache Software Foundation - <a href="http://www.apache.org" target="_blank">www.apache.org</a><br/>
-      ${uiLabelMap.CommonPoweredBy} <a href="http://ofbiz.apache.org" target="_blank">Apache OFBiz</a> <#include "ofbizhome://runtime/svninfo.ftl" />
+      ${uiLabelMap.CommonCopyright} (c) 2001-${nowTimestamp?string("yyyy")} 利东软件 - <a href="http://www.vteba.com" target="_blank">www.vteba.com</a><br/>
+      ${uiLabelMap.CommonPoweredBy} <a href="http://ofbiz.apache.org" target="_blank">利东软件科技</a> <#include "ofbizhome://runtime/svninfo.ftl" />
     </li>
     <li class="opposed">${nowTimestamp?datetime?string.short} -
   <a href="<@ofbizUrl>ListTimezones</@ofbizUrl>">${timeZone.getDisplayName(timeZone.useDaylightTime(), Static["java.util.TimeZone"].LONG, locale)}</a>

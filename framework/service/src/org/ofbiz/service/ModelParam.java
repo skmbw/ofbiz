@@ -35,8 +35,9 @@ import org.ofbiz.base.util.UtilValidate;
 /**
  * Generic Service Model Parameter
  */
-@SuppressWarnings("serial")
 public class ModelParam implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public static final String module = ModelParam.class.getName();
 
@@ -276,6 +277,7 @@ public class ModelParam implements Serializable {
     }
 
     static class ModelParamValidator implements Serializable {
+        private static final long serialVersionUID = 1L;
         protected String className;
         protected String methodName;
         protected String failMessage;

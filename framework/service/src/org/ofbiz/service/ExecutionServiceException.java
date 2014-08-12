@@ -20,6 +20,8 @@ package org.ofbiz.service;
 
 public class ExecutionServiceException extends org.ofbiz.base.util.GeneralException {
 
+    private static final long serialVersionUID = 5106362259928971696L;
+
     public ExecutionServiceException() {
         super();
     }

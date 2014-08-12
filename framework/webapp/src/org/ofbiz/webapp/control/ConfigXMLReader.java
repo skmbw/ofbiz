@@ -65,13 +65,14 @@ public class ConfigXMLReader {
     }
 
     public static ControllerConfig getControllerConfig(URL url) {
+        // 首先从缓存中获取，没有才重新加载。
         ControllerConfig controllerConfig = controllerCache.get(url);
         if (controllerConfig == null) { // don't want to block here
             synchronized (ConfigXMLReader.class) {
                 // must check if null again as one of the blocked threads can still enter
                 controllerConfig = controllerCache.get(url);
                 if (controllerConfig == null) {
-                    controllerConfig = new ControllerConfig(url);
+                    controllerConfig = new ControllerConfig(url);// 这里是真正的初始化，读取配置文件。
                     controllerCache.put(url, controllerConfig);
                 }
             }

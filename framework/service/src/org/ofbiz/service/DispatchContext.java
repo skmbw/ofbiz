@@ -51,10 +51,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Dispatcher Context
+ * Dispatcher Context。分发器上下文。
  */
-@SuppressWarnings("serial")
 public class DispatchContext implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public static final String module = DispatchContext.class.getName();
 

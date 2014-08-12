@@ -21,6 +21,7 @@ package org.ofbiz.base.util.collections;
 import java.io.Serializable;
 import java.util.Locale;
 import java.util.Map;
+
 import javax.el.PropertyNotFoundException;
 
 import org.ofbiz.base.lang.IsEmpty;
@@ -43,7 +44,8 @@ import org.ofbiz.base.util.string.UelUtil;
 public class FlexibleMapAccessor<T> implements Serializable, IsEmpty {
     public static final String module = FlexibleMapAccessor.class.getName();
     protected static final UtilCache<String, FlexibleMapAccessor<?>> fmaCache = UtilCache.createUtilCache("flexibleMapAccessor.ExpressionCache");
-    @SuppressWarnings("unchecked")
+    
+    @SuppressWarnings("rawtypes")
     protected static final FlexibleMapAccessor nullFma = new FlexibleMapAccessor("");
 
     protected final String original;
@@ -80,7 +82,7 @@ public class FlexibleMapAccessor<T> implements Serializable, IsEmpty {
      * @param original The original String expression
      * @return A FlexibleMapAccessor instance
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public static <T> FlexibleMapAccessor<T> getInstance(String original) {
         if (UtilValidate.isEmpty(original) || "null".equals(original)) {
             return nullFma;
@@ -210,12 +212,12 @@ public class FlexibleMapAccessor<T> implements Serializable, IsEmpty {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
         try {
+            @SuppressWarnings("rawtypes")
             FlexibleMapAccessor that = (FlexibleMapAccessor) obj;
             return UtilObject.equalsHelper(this.original, that.original);
         } catch (Exception e) {}

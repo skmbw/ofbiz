@@ -632,7 +632,7 @@ public class ServiceUtil {
         return locale;
     }
 
-    public static <T extends Object> Map<String, Object> makeContext(T... args) {
+    public static <T extends Object> Map<String, Object> makeContext(T[] args) {
         if (args != null) {
             for (int i = 0; i < args.length; i += 2) {
                 if (!(args[i] instanceof String)) throw new IllegalArgumentException("Arg(" + i + "), value(" + args[i] + ") is not a string.");

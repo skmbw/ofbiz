@@ -1318,7 +1318,8 @@ public class GenericEntity extends Observable implements Map<String, Object>, Lo
             ModelField field = this.getModelEntity().getField(curKey);
             if (field.getEncrypt()) {
                 String encryptField = (String) curValue;
-                curValue = HashCrypt.getDigestHash(encryptField);
+                //curValue = HashCrypt.getDigestHash(encryptField);
+                curValue = HashCrypt.cryptPassword("SHA", encryptField);
             }
             theString.append('[');
             theString.append(curKey);

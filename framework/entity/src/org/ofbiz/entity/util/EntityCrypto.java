@@ -119,7 +119,7 @@ public class EntityCrypto {
     }
 
     protected SecretKey getKeyFromStore(String originalKeyName, boolean useOldFunnyKeyHash) throws EntityCryptoException {
-        String hashedKeyName = useOldFunnyKeyHash? HashCrypt.getDigestHashOldFunnyHexEncode(originalKeyName, null) : HashCrypt.getDigestHash(originalKeyName);
+        String hashedKeyName = useOldFunnyKeyHash? HashCrypt.getDigestHashOldFunnyHexEncode(originalKeyName, null) : HashCrypt.cryptPassword("SHA", originalKeyName);
 
         GenericValue keyValue = null;
         try {

@@ -34,6 +34,7 @@ import org.ofbiz.entity.transaction.TransactionUtil;
 
 /**
  * ServiceXaWrapper - XA Resource wrapper for running services on commit() or rollback()
+ * <p>正在运行的服务，关于提交和回滚的，XA资源包装器。
  */
 public class ServiceXaWrapper extends GenericXaResource {
 

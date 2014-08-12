@@ -53,7 +53,7 @@ public class MapStack<K> extends MapContext<K, Object> {
         return newValue;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public static <K> MapStack<K> create(Map<K, Object> baseMap) {
         MapStack<K> newValue = MapStack.getMapStack();
         if (baseMap instanceof MapStack) {

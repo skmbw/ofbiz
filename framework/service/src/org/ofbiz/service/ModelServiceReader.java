@@ -20,8 +20,6 @@ package org.ofbiz.service;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -37,7 +35,6 @@ import org.ofbiz.base.config.GenericConfigException;
 import org.ofbiz.base.config.ResourceHandler;
 import org.ofbiz.base.util.Debug;
 import org.ofbiz.base.util.GeneralException;
-import org.ofbiz.base.util.UtilProperties;
 import org.ofbiz.base.util.UtilTimer;
 import org.ofbiz.base.util.UtilValidate;
 import org.ofbiz.base.util.UtilXml;
@@ -46,7 +43,6 @@ import org.ofbiz.entity.GenericEntityException;
 import org.ofbiz.entity.model.ModelEntity;
 import org.ofbiz.entity.model.ModelField;
 import org.ofbiz.entity.model.ModelFieldType;
-import org.ofbiz.service.engine.GenericEngine;
 import org.ofbiz.service.group.GroupModel;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -58,6 +54,7 @@ import freemarker.template.utility.StringUtil;
 
 /**
  * Generic Service - Service Definition Reader
+ * <p>通用服务，服务定义读取器。
  */
 @SuppressWarnings("serial")
 public class ModelServiceReader implements Serializable {
