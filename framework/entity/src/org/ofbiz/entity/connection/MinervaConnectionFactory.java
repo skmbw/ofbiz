@@ -60,10 +60,10 @@ public class MinervaConnectionFactory implements ConnectionFactoryInterface {
             }
 
             XADataSourceImpl ds = new XADataSourceImpl();
-
-            if (ds == null) {
-                throw new GenericEntityException("XADataSource was not created, big problem!");
-            }
+//yinlei
+//            if (ds == null) {
+//                throw new GenericEntityException("XADataSource was not created, big problem!");
+//            }
             
             String jdbcUri = UtilValidate.isNotEmpty(helperInfo.getOverrideJdbcUri()) ? helperInfo.getOverrideJdbcUri() : jdbcElement.getAttribute("jdbc-uri");
             String jdbcUsername = UtilValidate.isNotEmpty(helperInfo.getOverrideUsername()) ? helperInfo.getOverrideUsername() : jdbcElement.getAttribute("jdbc-username");

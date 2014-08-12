@@ -796,9 +796,9 @@ public class TransactionUtil implements Status {
             Debug.logError(this.getCauseThrowable(), (message == null ? "" : message) + this.getCauseMessage(), module);
         }
 
-        public boolean isEmpty() {
-            return (UtilValidate.isEmpty(this.getCauseMessage()) && this.getCauseThrowable() == null);
-        }
+//        public boolean isEmpty() {
+//            return (UtilValidate.isEmpty(this.getCauseMessage()) && this.getCauseThrowable() == null);
+//        }
     }
 
     private static void pushSetRollbackOnlyCauseSave(RollbackOnlyCause e) {

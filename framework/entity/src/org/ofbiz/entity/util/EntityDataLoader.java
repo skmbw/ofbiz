@@ -131,10 +131,11 @@ public class EntityDataLoader {
                             }
                         }
                     }
-                } else {
-                    String errorMsg = "Could not find entity-data-reader named: " + readerName;
-                    Debug.logWarning(errorMsg, module);
                 }
+//                else {
+//                    String errorMsg = "Could not find entity-data-reader named: " + readerName;
+//                    Debug.logWarning(errorMsg, module);
+//                }
             }
         } else {
             String errorMsg = "Could not find datasource named: " + helperName;

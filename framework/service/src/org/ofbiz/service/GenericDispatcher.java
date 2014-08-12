@@ -31,6 +31,7 @@ import org.ofbiz.entity.Delegator;
 
 /**
  * Generic Services Local Dispatcher
+ * <p>通用服务，本地分发器
  */
 public class GenericDispatcher extends GenericAbstractDispatcher {
 

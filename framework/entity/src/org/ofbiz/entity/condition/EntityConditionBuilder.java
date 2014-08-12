@@ -26,7 +26,6 @@ import java.util.Map;
 import org.ofbiz.base.util.UtilGenerics;
 
 import javolution.util.FastList;
-
 import groovy.util.BuilderSupport;
 
 public class EntityConditionBuilder extends BuilderSupport {
@@ -46,9 +45,8 @@ public class EntityConditionBuilder extends BuilderSupport {
         return node;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    protected Object createNode(Object methodName, Map mapArg) {
+    protected Object createNode(Object methodName, @SuppressWarnings("rawtypes") Map mapArg) {
         Map<String, Object> fieldValueMap = UtilGenerics.checkMap(mapArg);
         String operatorName = ((String)methodName).toLowerCase();
         EntityComparisonOperator<String, Object> operator = EntityOperator.lookupComparison(operatorName);
@@ -63,9 +61,8 @@ public class EntityConditionBuilder extends BuilderSupport {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    protected Object createNode(Object methodName, Map mapArg, Object objArg) {
+    protected Object createNode(Object methodName, @SuppressWarnings("rawtypes") Map mapArg, Object objArg) {
         return null;
     }
 

@@ -1919,7 +1919,9 @@ public class DatabaseUtil {
             String sql2 = sql2Buf.toString();
             if (Debug.infoOn()) Debug.logInfo("[addColumn] sql failed, trying sql2=" + sql2, module);
             try {
-                stmt = connection.createStatement();
+                if (stmt == null) {
+                    stmt = connection.createStatement();
+                }
                 stmt.executeUpdate(sql2);
             } catch (SQLException e2) {
                 // if this also fails report original error, not this error...

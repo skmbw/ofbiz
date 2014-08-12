@@ -50,7 +50,7 @@ public class EntityFieldMap extends EntityConditionListBase<EntityExpr> {
         super();
     }
 
-    public static <V> List<EntityExpr> makeConditionList(EntityComparisonOperator<?,V> op, V... keysValues) {
+    public static <V> List<EntityExpr> makeConditionList(EntityComparisonOperator<?,V> op, V[] keysValues) {
         return makeConditionList(EntityUtil.makeFields(keysValues), op);
     }
 
@@ -63,7 +63,7 @@ public class EntityFieldMap extends EntityConditionListBase<EntityExpr> {
         return list;
     }
 
-    public <V> void init(EntityComparisonOperator<?,?> compOp, EntityJoinOperator joinOp, V... keysValues) {
+    public <V> void init(EntityComparisonOperator<?,?> compOp, EntityJoinOperator joinOp, V[] keysValues) {
         super.init(makeConditionList(EntityUtil.makeFields(keysValues), UtilGenerics.<EntityComparisonOperator<String,V>>cast(compOp)), joinOp);
         this.fieldMap = EntityUtil.makeFields(keysValues);
         if (this.fieldMap == null) this.fieldMap = FastMap.newInstance();

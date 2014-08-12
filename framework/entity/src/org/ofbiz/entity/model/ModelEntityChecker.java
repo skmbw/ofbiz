@@ -69,7 +69,7 @@ public class ModelEntityChecker {
             entities.add(eName);
         }
         //int numberOfEntities = ec.size();
-        int numberShowed = 0;
+        //int numberShowed = 0;
 
         TreeSet<String> fkNames = new TreeSet<String>();
         TreeSet<String> indexNames = new TreeSet<String>();
@@ -278,7 +278,7 @@ public class ModelEntityChecker {
                         }
                     }
                 }
-                numberShowed++;
+                //numberShowed++;
             }
         }
     }

@@ -53,7 +53,7 @@ public class EntityUtil {
 
     public static final String module = EntityUtil.class.getName();
 
-    public static <V> Map<String, V> makeFields(V... args) {
+    public static <V> Map<String, V> makeFields(V[] args) {
         Map<String, V> fields = FastMap.newInstance();
         if (args != null) {
             for (int i = 0; i < args.length;) {

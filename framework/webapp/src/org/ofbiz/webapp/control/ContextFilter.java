@@ -196,6 +196,7 @@ public class ContextFilter implements Filter {
         // test to see if we have come through the control servlet already, if not do the processing
         String requestPath = null;
         String contextUri = null;
+        // 检查看一下，我们是否已经通过了一些控制器，如果没有处理它
         if (httpRequest.getAttribute(ContextFilter.FORWARDED_FROM_SERVLET) == null) {
             // Debug.logInfo("In ContextFilter.doFilter, FORWARDED_FROM_SERVLET is NOT set", module);
             String allowedPath = config.getInitParameter("allowedPaths");
@@ -208,6 +209,7 @@ public class ContextFilter implements Filter {
 
             if (debug) Debug.logInfo("[Domain]: " + httpRequest.getServerName() + " [Request]: " + httpRequest.getRequestURI(), module);
 
+            // 组装请求的url
             requestPath = httpRequest.getServletPath();
             if (requestPath == null) requestPath = "";
             if (requestPath.lastIndexOf("/") > 0) {
@@ -247,6 +249,7 @@ public class ContextFilter implements Filter {
             }
 
             // check to make sure the requested url is allowed
+            // 确保请求的url是允许的
             if (!allowList.contains(requestPath) && !allowList.contains(requestInfo) && !allowList.contains(httpRequest.getServletPath())) {
                 String filterMessage = "[Filtered request]: " + contextUri;
                 
@@ -275,6 +278,7 @@ public class ContextFilter implements Filter {
         }
 
         // check if multi tenant is enabled
+        // 检查多租户是否是可用的
         String useMultitenant = UtilProperties.getPropertyValue("general.properties", "multitenant");
         if ("Y".equals(useMultitenant)) {
             // get tenant delegator by domain name
@@ -283,6 +287,7 @@ public class ContextFilter implements Filter {
                 // if tenant was specified, replace delegator with the new per-tenant delegator and set tenantId to session attribute
                 Delegator delegator = getDelegator(config.getServletContext());
                 List<GenericValue> tenants = delegator.findList("Tenant", EntityCondition.makeCondition("domainName", serverName), null, UtilMisc.toList("-createdStamp"), null, false);
+                // 如果存在多租户，设置相关的属性到http context
                 if (UtilValidate.isNotEmpty(tenants)) {
                     GenericValue tenant = EntityUtil.getFirst(tenants);
                     String tenantId = tenant.getString("tenantId");
@@ -334,6 +339,7 @@ public class ContextFilter implements Filter {
         }
 
         // we're done checking; continue on
+        // 我们检查完毕，继续
         chain.doFilter(httpRequest, httpResponse);
 
         // reset thread local security
@@ -363,7 +369,11 @@ public class ContextFilter implements Filter {
         return dispatcher;
     }
 
-    /** This method only sets up a dispatcher for the current webapp and passed in delegator, it does not save it to the ServletContext or anywhere else, just returns it */
+    /** This method only sets up a dispatcher for the current webapp and passed in delegator, 
+     * it does not save it to the ServletContext or anywhere else, just returns it 
+     * <p>该方法，仅仅设置请求分发器到现在的webapp，然后传递给delegator，并不会保存到ServletContext，或其他地方，
+     * 仅仅返回它。
+     */
     public static LocalDispatcher makeWebappDispatcher(ServletContext servletContext, Delegator delegator) {
         if (delegator == null) {
             Debug.logError("[ContextFilter.init] ERROR: delegator not defined.", module);
@@ -410,6 +420,7 @@ public class ContextFilter implements Filter {
                 delegatorName = "default";
             }
             if (Debug.verboseOn()) Debug.logVerbose("Setup Entity Engine Delegator with name " + delegatorName, module);
+            // 从实体工厂，获取实体委托
             delegator = DelegatorFactory.getDelegator(delegatorName);
             servletContext.setAttribute("delegator", delegator);
             if (delegator == null) {

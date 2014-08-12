@@ -21,7 +21,6 @@ package org.ofbiz.entity.connection;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -42,15 +41,6 @@ import org.ofbiz.entity.GenericEntityException;
 import org.ofbiz.entity.datasource.GenericHelperInfo;
 import org.ofbiz.entity.transaction.TransactionFactory;
 import org.w3c.dom.Element;
-
-import javax.transaction.TransactionManager;
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.SQLException;
-import java.util.Map;
-import java.util.Properties;
-
-import javolution.util.FastMap;
 
 /**
  * DBCPConnectionFactory

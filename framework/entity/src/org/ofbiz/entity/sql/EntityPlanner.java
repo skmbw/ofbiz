@@ -74,7 +74,7 @@ public class EntityPlanner extends Planner<EntityPlanner, EntityCondition, Entit
     public EntitySelectPlan planSelect(SQLSelect selectStatement) {
         DynamicViewEntity dve = new DynamicViewEntity();
         Unioned unioned = selectStatement.getUnioned();
-        if (unioned != null) {
+        if (unioned == null) {// yinlei 2014-8-12 !=null 改为 == null
             throw new IllegalArgumentException("union views not yet supported");
         }
         SelectGroup selectGroup = unioned.getGroup();
