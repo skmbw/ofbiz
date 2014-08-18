@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.sql.Timestamp;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -886,7 +885,7 @@ public class ContentServices {
             locale = (Locale) templateContext.get("locale");
         }
         GenericValue subContentDataResourceView = (GenericValue) context.get("subContentDataResourceView");
-        if (subContentDataResourceView != null && subContentDataResourceView == null) {
+        if (subContentDataResourceView == null) {
             subContentDataResourceView = (GenericValue) templateContext.get("subContentDataResourceView");
         }
 

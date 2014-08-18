@@ -389,6 +389,8 @@ public class CommonServices {
             RandomAccessFile file2 = new RandomAccessFile(outputPath2, "rw");
             file1.write(buffer1.array());
             file2.write(buffer2.array());
+            file1.close();
+            file2.close();
         } catch (FileNotFoundException e) {
             Debug.logError(e, module);
         } catch (IOException e) {

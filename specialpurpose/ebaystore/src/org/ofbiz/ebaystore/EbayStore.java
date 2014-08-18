@@ -1311,8 +1311,8 @@ public class EbayStore {
                 storeType.setCustomHeader((String)context.get("storeCustomHeader"));
                 storeType.setCustomHeaderLayout(StoreCustomHeaderLayoutCodeType.valueOf((String)context.get("storeCustomHeaderLayout")));
 
-                if ( storeType == null )
-                      throw new SdkException("StoreType property is not set.");
+//                if ( storeType == null )
+//                      throw new SdkException("StoreType property is not set.");
 
                 req.setStore(storeType);
                 resp = (SetStoreResponseType) call.execute(req);
@@ -2257,9 +2257,11 @@ public class EbayStore {
                 // Upload image to ofbiz path /runtime/tmp .
                 ByteBuffer byteWrap = (ByteBuffer) context.get("imageData");
                 File file = new File(System.getProperty("ofbiz.home"), "runtime" + File.separator + "tmp" + File.separator + imageFileName);
-                FileChannel wChannel = new FileOutputStream(file, false).getChannel();
+                FileOutputStream fos = new FileOutputStream(file, false);
+                FileChannel wChannel = fos.getChannel();
                 wChannel.write(byteWrap);
                 wChannel.close();
+                fos.close();
 
                 // Set path file picture to api and set picture details.
                 String [] pictureFiles = {System.getProperty("ofbiz.home") + File.separator + "runtime" + File.separator + "tmp" + File.separator + imageFileName};

@@ -166,6 +166,7 @@ public final class Debug {
                 Formatter formatter = new Formatter(sb);
                 formatter.format(msg, params);
                 msg = sb.toString();
+                formatter.close();
             }
             // pack the exception
             if (packException && t != null) {
