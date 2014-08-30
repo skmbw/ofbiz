@@ -73,9 +73,9 @@ public class ControlServlet extends HttpServlet {
         super.init(config);
         if (Debug.infoOn()) Debug.logInfo("LOADING WEBAPP [" + config.getServletContext().getContextPath().substring(1) + "] " + config.getServletContext().getServletContextName() + ", located at " + config.getServletContext().getRealPath("/"), module);
 
-        // configure custom BSF engines
+        // 配置客户定制的 BSF 引擎
         configureBsf();
-        // initialize the request handler
+        // 初始化请求处理器
         getRequestHandler();
     }
 
