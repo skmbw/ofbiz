@@ -69,7 +69,7 @@ import org.ofbiz.entity.util.EntityListIterator;
 
 /**
  * Generic Entity Data Access Object - Handles persistence for any defined entity.
- *
+ * <p>通用实体访问对象。处理任何实体的持久化。
  */
 public class GenericDAO {
 
@@ -77,6 +77,7 @@ public class GenericDAO {
 
     private static final FastMap<String, GenericDAO> genericDAOs = FastMap.newInstance();
     private static final ThreadGroup GENERIC_DAO_THREAD_GROUP = new ThreadGroup("GenericDAO");
+    /**保存数据库连接相关的信息*/
     private final GenericHelperInfo helperInfo;
     private final ModelFieldTypeReader modelFieldTypeReader;
     private final DatasourceInfo datasourceInfo;
