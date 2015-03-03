@@ -1,5 +1,5 @@
 <#if persons?has_content>
-  <h2>Some of the people who visited our site are:</h2>
+  <h2>其中访问我们网站的用户有:</h2>
   <br>
   <ul>
     <#list persons as person>
